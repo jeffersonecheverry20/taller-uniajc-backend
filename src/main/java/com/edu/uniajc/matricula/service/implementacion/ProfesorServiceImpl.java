@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.util.List;
 
 @Service
 public class ProfesorServiceImpl implements IProfesorService {
@@ -39,14 +40,31 @@ public class ProfesorServiceImpl implements IProfesorService {
         return profesorRepository.findByCodigoProfesor(codigo).orElse(null);
     }
 
+    @Override
+    public List<Profesor> buscarProfesores() throws SQLException, Exception {
+        return profesorRepository.findAll();
+    }
+
     @Transactional
     @Override
-    public Profesor eliminarProfesor(Long id) throws SQLException, Exception {
+    public Profesor eliminarProfesorById(Long id) throws SQLException, Exception {
         Profesor profesorBD = buscarProfesorById(id);
         if(profesorBD != null){
             profesorRepository.deleteById(id);
         }
         return profesorBD;
     }
+
+    @Transactional
+    @Override
+    public Profesor eliminarProfesorByCodigo(String codigo) throws SQLException, Exception {
+        Profesor profesorBD = buscarProfesorByCodigo(codigo);
+        if(profesorBD != null){
+            profesorRepository.delete(profesorBD);
+        }
+        return profesorBD;
+    }
+
+
 
 }

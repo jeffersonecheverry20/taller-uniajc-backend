@@ -21,13 +21,5 @@ public class Authority implements Serializable {
     @Column(name = "rol", nullable = false)
     private String rol;
 
-    /*@OneToOne(mappedBy = "authority")
-    private Estudiante estudiante;
-
-    @OneToOne(mappedBy = "authority")
-    private Profesor profesor;
-
-    @OneToOne(mappedBy = "authority")
-    private Administrador administrador;*/
 
 }

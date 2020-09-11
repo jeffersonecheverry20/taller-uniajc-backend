@@ -4,6 +4,7 @@ import com.edu.uniajc.matricula.entity.Persona;
 import com.edu.uniajc.matricula.entity.Profesor;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public interface IProfesorService {
 
@@ -13,6 +14,10 @@ public interface IProfesorService {
 
     public Profesor buscarProfesorByCodigo(String codigo) throws SQLException, Exception;
 
-    public Profesor eliminarProfesor(Long id) throws SQLException, Exception;
+    public List<Profesor> buscarProfesores() throws SQLException, Exception;
+
+    public Profesor eliminarProfesorById(Long id) throws SQLException, Exception;
+
+    public Profesor eliminarProfesorByCodigo(String codigo) throws SQLException, Exception;
 
 }

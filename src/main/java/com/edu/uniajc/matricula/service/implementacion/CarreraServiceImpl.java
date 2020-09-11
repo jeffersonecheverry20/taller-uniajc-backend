@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.util.List;
 
 @Service
 public class CarreraServiceImpl implements ICarreraService {
@@ -43,6 +44,12 @@ public class CarreraServiceImpl implements ICarreraService {
     @Override
     public Carrera buscarCarreraByNombre(String nombre) throws Exception, SQLException {
         return carreraRepository.findByNombreCarrera(nombre).orElse(null);
+    }
+
+    @Transactional
+    @Override
+    public List<Carrera> buscarCarreras() throws SQLException, Exception {
+        return carreraRepository.findAll();
     }
 
     @Transactional

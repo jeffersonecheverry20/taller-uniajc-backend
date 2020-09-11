@@ -1,5 +1,6 @@
 package com.edu.uniajc.matricula.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,23 +18,26 @@ public class Estudiante implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    public Long id;
+    private Long id;
 
     @Column(name = "codigo_estudiante")
-    public String codigoEstudiante;
+    private String codigoEstudiante;
 
     @Column(name = "creditos_aprobados", nullable = false)
-    public int creditosAprobados;
+    private int creditosAprobados;
 
-    @Column(name = "semstre_actual", nullable = false)
+    @Column(name = "semestre_actual", nullable = false)
     private String semestreActual;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "carrera", referencedColumnName = "id", nullable = false)
     private Carrera carrera;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "authority", referencedColumnName = "id", nullable = false)
     private Authority authority;
 
+    @JsonBackReference
+    @OneToMany(mappedBy = "estudiante")
+    private Set<MatriculaAcademica> matriculaAcademicas;
 }

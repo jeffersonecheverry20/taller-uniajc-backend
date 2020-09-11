@@ -66,7 +66,8 @@ public class PersonaServiceImpl implements IPersonaService {
     @Transactional
     @Override
     public Persona buscarPersonaByUsuario(Usuario usuario) throws SQLException, Exception {
-        return personaRepository.findByUsuario(usuario).orElse(null);
+        LOGGER.info("JSE --> Ejecuto el servicio buscarPersonaByUsuario");
+        return personaRepository.findByUsuario(usuario.getId()).orElse(null);
     }
 
     @Transactional

@@ -5,6 +5,7 @@ import com.edu.uniajc.matricula.entity.Curso;
 import com.edu.uniajc.matricula.entity.Estudiante;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public interface ICursoService {
 
@@ -14,6 +15,12 @@ public interface ICursoService {
 
     public Curso buscarCursoByCodigo(String codigo) throws SQLException, Exception;
 
-    public Curso eliminarCurso(Long id) throws SQLException, Exception;
+    public List<Curso> buscarCursos() throws SQLException, Exception;
+
+    public Curso buscarCursoByNombre(String nombre) throws SQLException, Exception;
+
+    public Curso eliminarCursoById(Long id) throws SQLException, Exception;
+
+    public Curso eliminarCursoByCodigo(String codigo) throws SQLException, Exception;
 
 }

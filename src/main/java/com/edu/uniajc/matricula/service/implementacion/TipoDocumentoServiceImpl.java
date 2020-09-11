@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.util.List;
 
 @Service
 public class TipoDocumentoServiceImpl implements ITipoDocumentoService {
@@ -37,6 +38,11 @@ public class TipoDocumentoServiceImpl implements ITipoDocumentoService {
     @Override
     public TipoDocumento buscarTipoDocumentoByCodigo(String codigo) throws SQLException, Exception {
         return tipoDocumentoRepository.findByCodigo(codigo).orElse(null);
+    }
+
+    @Override
+    public List<TipoDocumento> buscarTipoDocumentos() throws SQLException, Exception {
+        return tipoDocumentoRepository.findAll();
     }
 
     @Override

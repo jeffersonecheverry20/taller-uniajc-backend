@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.util.List;
 
 @Service
 public class EstudianteServiceImpl implements IEstudianteService {
@@ -41,6 +42,12 @@ public class EstudianteServiceImpl implements IEstudianteService {
     @Override
     public Estudiante buscarEstudianteByCodigo(String codigo) throws SQLException, Exception {
         return estudianteRepository.findByCodigoEstudiante(codigo).orElse(null);
+    }
+
+    @Transactional
+    @Override
+    public List<Estudiante> buscarEstudiantes() throws SQLException, Exception {
+        return estudianteRepository.findAll();
     }
 
     @Transactional

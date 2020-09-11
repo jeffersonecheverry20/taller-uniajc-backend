@@ -1,6 +1,8 @@
 package com.edu.uniajc.matricula.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +12,7 @@ import java.util.Set;
 
 @Entity
 @Data @AllArgsConstructor @NoArgsConstructor
+@Builder
 public class Profesor implements Serializable {
 
     @Id
@@ -20,14 +23,13 @@ public class Profesor implements Serializable {
     @Column(name = "codigo", nullable = false)
     private String codigoProfesor;
 
-    @OneToOne(mappedBy = "profesor")
-    private Persona persona;
-
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "authority", referencedColumnName = "id", nullable = false)
     private Authority authority;
 
-    @OneToMany(mappedBy = "profesor")
-    private Set<Curso> cursos;
+    @JsonBackReference
+    @OneToMany(mappedBy = "nota")
+    private Set<MatriculaAcademica> matriculaAcademicas;
+
 
 }

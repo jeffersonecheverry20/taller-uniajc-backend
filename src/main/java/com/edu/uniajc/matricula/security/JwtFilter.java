@@ -60,6 +60,7 @@ public class JwtFilter extends OncePerRequestFilter {
             token = requestTokenHeader.substring(7);
             try{
                 username = jwtUtil.getUsernameFromToken(token);
+                LOGGER.info("JSE --> El usuario del token es "+username);
             }catch (IllegalArgumentException ie){
                 LOGGER.info(ie.getMessage());
             }catch (ExpiredJwtException je){
@@ -74,9 +75,11 @@ public class JwtFilter extends OncePerRequestFilter {
             try{
                 usuario = usuarioService.buscarUsuarioByUsuario(username);
                 LOGGER.info("JSE --> El usuario es "+usuario.getUsuario());
+                LOGGER.info("JSE --> El id del usuario es "+usuario.getId());
                 if(usuario != null && jwtUtil.validateToken(token, usuario)) {
                     List<Authority> authorities = new ArrayList<>();
                     Persona persona = personaService.buscarPersonaByUsuario(usuario);
+                    LOGGER.info("JSE --> La persona es "+persona.getNombre()+""+persona.getApellido());
                     Authority authority = Utilidades.buscarAuhtority(persona);
                     authorities.add(authority);
                     List<GrantedAuthority> grantedAuthorities = authorities.stream()
@@ -87,9 +90,10 @@ public class JwtFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }catch (Exception ex){
-                LOGGER.info(ex.getMessage());
+                LOGGER.info("JSE --> La excepción en el filtro de autorización es "+ex.getMessage());
             }
         }
+        LOGGER.info("Finalizo el filtro del token");
         filterChain.doFilter(request, response);
     }
 

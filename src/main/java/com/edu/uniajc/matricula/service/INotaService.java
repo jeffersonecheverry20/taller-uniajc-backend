@@ -12,8 +12,10 @@ public interface INotaService {
 
     public Nota buscarNotaById(Long id) throws SQLException, Exception;
 
-    public Nota buscarNotaByCodigo(String codigo) throws SQLException, Exception;
-
     public Nota eliminarNota(Long id) throws SQLException, Exception;
+
+    public double calcularDefinitiva(Long id) throws SQLException, Exception;
+
+    public boolean validarAprobacion(Long id) throws SQLException, Exception;
 
 }

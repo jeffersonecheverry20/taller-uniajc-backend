@@ -80,6 +80,53 @@ public class Utilidades {
                 .build();
     }
 
+    public static Profesor buildProfesor(JsonObject object, Authority authority){
+        return Profesor.builder()
+                .codigoProfesor(object.get("codigoProfesor").getAsString())
+                .authority(authority)
+                .build();
+    }
+
+    public static Administrador buildAdministrador(JsonObject object, Authority authority){
+        return Administrador.builder()
+                .codigoAdministrador(object.get("codigoAdministrador").getAsString())
+                .authority(authority)
+                .build();
+    }
+
+    public static Curso buildCurso(JsonObject object){
+        LOGGER.info("JSE --> El jsonObject en buildCurso es "+object);
+        return Curso.builder()
+                .codigoCurso(object.get("codigoCurso").getAsString())
+                .creditos(object.get("creditos").getAsInt())
+                .grupoCurso(object.get("grupoCurso").getAsString())
+                .descripcion(object.get("descripcion").getAsString())
+                .limiteEstudiantes(object.get("limiteEstudiantes").getAsInt())
+                .nombreCurso(object.get("nombreCurso").getAsString())
+                .build();
+    }
+
+    public static Nota buildNota(double p1, double p2, double p3, double quiz, double proyecto, double definitiva){
+        return Nota.builder()
+                .parcialI(p1)
+                .parcialII(p2)
+                .parcialIII(p3)
+                .quiz(quiz)
+                .proyecto(proyecto)
+                .definitiva(definitiva)
+                .build();
+    }
+
+    public static MatriculaAcademica buildMatriculaAcademica(Curso curso, Estudiante estudiante, boolean aprobado, Nota nota, Profesor profesor){
+        return MatriculaAcademica.builder()
+                .curso(curso)
+                .estudiante(estudiante)
+                .aprobado(aprobado)
+                .nota(nota)
+                .profesor(profesor)
+                .build();
+    }
+
     public static Respuesta buildRespuesta(String codigo, String mensaje, Object objeto, Respuesta respuesta) {
         return Respuesta.builder()
                 .codigo(codigo)
@@ -126,7 +173,17 @@ public class Utilidades {
         return object != null;
     }
 
+    public static boolean validarListaObjetos(Listas objetos){
+        return objetos.getListaObjetos() != null && !objetos.getListaObjetos().isEmpty();
+    }
+
     public static Authority buscarAuhtority(Persona persona) {
+        //LOGGER.info("JSE --> El estudiante de la persona es "+persona.getEstudiante().toString());
+        //LOGGER.info("JSE --> El profesor de la persona es "+persona.getProfesor().toString());
+        //LOGGER.info("JSE --> El administrador de la persona es "+persona.getAdministrador().toString());
+        LOGGER.info("La persona en utilidades es "+persona.getNombre());
+        LOGGER.info("La persona es diferente de null "+(persona.getEstudiante() != null));
+        //LOGGER.info("El codigo del estudiante es "+persona.getEstudiante().getCodigoEstudiante());
         Authority authority = null;
         if(persona.getEstudiante() != null){
             Estudiante estudiante = persona.getEstudiante();
@@ -134,7 +191,9 @@ public class Utilidades {
         } else if(persona.getProfesor() != null){
             Profesor profesor = persona.getProfesor();
             authority = profesor.getAuthority();
-        } else {
+        } else if(persona.getAdministrador() != null){
+            LOGGER.info("JSE --> Entro administrador");
+            LOGGER.info("JSE --> El administrador es "+persona.getAdministrador().toString());
             Administrador administrador = persona.getAdministrador();
             authority = administrador.getAuthority();
         }

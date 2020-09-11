@@ -1,5 +1,6 @@
 package com.edu.uniajc.matricula.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class TipoDocumento implements Serializable {
     @Column(name = "valor", nullable = false)
     private String valor;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "tipoDocumento")
     private Set<Persona> personas;
 
