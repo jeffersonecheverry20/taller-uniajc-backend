@@ -3,14 +3,19 @@ package com.edu.uniajc.matricula.service.implementacion;
 import com.edu.uniajc.matricula.entity.Administrador;
 import com.edu.uniajc.matricula.repository.AdministradorRepository;
 import com.edu.uniajc.matricula.service.IAdministradorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.util.List;
 
 @Service
 public class AdministradorServiceImpl implements IAdministradorService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdministradorServiceImpl.class);
 
     @Autowired
     private AdministradorRepository administradorRepository;
@@ -36,6 +41,12 @@ public class AdministradorServiceImpl implements IAdministradorService {
     @Override
     public Administrador buscarAdministradorByCodigo(String codigo) throws SQLException, Exception {
         return administradorRepository.findByCodigoAdministrador(codigo).orElse(null);
+    }
+
+    @Transactional
+    @Override
+    public List<Administrador> buscarAdministradores() throws SQLException, Exception {
+        return administradorRepository.findAll();
     }
 
     @Transactional

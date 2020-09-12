@@ -21,6 +21,7 @@ import springfox.documentation.spring.web.json.Json;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class FacadeImpl implements Facade {
@@ -224,9 +225,7 @@ public class FacadeImpl implements Facade {
                 try{
                     LOGGER.info("JSE --> El id es "+objeto.get("objeto").getAsLong());
                     Estudiante estudiante = estudianteService.buscarEstudianteById(objeto.get("objeto").getAsLong());
-                    LOGGER.info("JSE --> El estudiante es "+estudiante.toString());
                     Persona persona = personaService.buscarPersonaByEstudiante(estudiante);
-                    LOGGER.info("JSE --> La persona es "+persona);
                     return Utilidades.validarResponse(persona, respuesta);
                 }catch (Exception ex){
                     ex.printStackTrace();
@@ -250,8 +249,17 @@ public class FacadeImpl implements Facade {
             case Constantes.OPE_BUSCAR_ESTUDIANTES: {
                 try{
                     List<Estudiante> estudiantes = estudianteService.buscarEstudiantes();
+                    List<Persona> personas = estudiantes != null && !estudiantes.isEmpty() ?
+                            estudiantes.stream().map(e -> {
+                                try{
+                                    return personaService.buscarPersonaByEstudiante(e);
+                                }catch (Exception ex){
+
+                                }
+                                return null;
+                            }).collect(Collectors.toList()) : null;
                     Listas listas = new Listas();
-                    listas.setListaObjetos(estudiantes);
+                    listas.setListaObjetos(personas);
                     return Utilidades.validarListaResponse(listas, respuesta);
                 }catch (Exception ex){
                     ex.printStackTrace();
@@ -405,8 +413,17 @@ public class FacadeImpl implements Facade {
             case Constantes.OPE_BUSCAR_PROFESORES: {
                 try{
                     List<Profesor> profesores = profesorService.buscarProfesores();
+                    List<Persona> personas = profesores != null && !profesores.isEmpty() ?
+                            profesores.stream().map(p -> {
+                                try{
+                                    return personaService.buscarPersonaByProfesor(p);
+                                }catch (Exception ex){
+
+                                }
+                                return null;
+                            }).collect(Collectors.toList()) : null;
                     Listas listas = new Listas();
-                    listas.add(profesores);
+                    listas.add(personas);
                     return Utilidades.validarListaResponse(listas, respuesta);
                 }catch (Exception ex){
                     ex.printStackTrace();
@@ -510,8 +527,17 @@ public class FacadeImpl implements Facade {
             case Constantes.OPE_BUSCAR_ADMINISTRADORES: {
                 try{
                     List<Administrador> administradores = administradorService.buscarAdministradores();
+                    List<Persona> personas = administradores != null && !administradores.isEmpty() ?
+                            administradores.stream().map(a -> {
+                                try{
+                                    return personaService.buscarPersonaByAdministrador(a);
+                                }catch (Exception ex){
+
+                                }
+                                return null;
+                            }).collect(Collectors.toList()) : null;
                     Listas listas = new Listas();
-                    listas.add(administradores);
+                    listas.add(personas);
                     return Utilidades.validarListaResponse(listas, respuesta);
                 }catch (Exception ex){
                     ex.printStackTrace();
@@ -526,7 +552,7 @@ public class FacadeImpl implements Facade {
                     Persona persona = Utilidades.validarObjeto(administrador) ? personaService.buscarPersonaByAdministrador(administrador) : null;
                     if(Utilidades.validarObjeto(persona)){
                         personaService.eliminarPersonaByAdministrador(administrador);
-                        profesorService.eliminarProfesorById(administrador.getId());
+                        administradorService.eliminarAdministradorById(administrador.getId());
                         usuarioService.eliminarUsuarioById(persona.getUsuario().getId());
                     }
                     return Utilidades.validarResponse(persona, respuesta);
@@ -632,7 +658,6 @@ public class FacadeImpl implements Facade {
                     //JsonObject
                     JsonObject objectCurso = objeto.get("curso").getAsJsonObject();
                     JsonObject objectEstudiante = objeto.get("estudiante").getAsJsonObject();
-                    JsonObject objectProfesor = objectCurso.get("profesor").getAsJsonObject();
 
                     //Curso
                     String codigoCurso = objectCurso.get("codigoCurso").getAsString();
@@ -657,8 +682,8 @@ public class FacadeImpl implements Facade {
             }
             case Constantes.OPE_BUSCAR_PROFESOR_BY_CURSO: {
                 try{
-                    String nombreCurso = objeto.get("nombreCurso").getAsString();
-                    Curso curso = cursoService.buscarCursoByNombre(nombreCurso);
+                    String codigoCurso = objeto.get("codigoCurso").getAsString();
+                    Curso curso = cursoService.buscarCursoByCodigo(codigoCurso);
                     List<MatriculaAcademica> academicaListas = Utilidades.validarObjeto(curso) ? matriculaAcademicaService.buscarMatriculaAcademicaByCurso(curso) : null;
                     Listas listas = new Listas();
                     listas.add(academicaListas);
@@ -673,10 +698,7 @@ public class FacadeImpl implements Facade {
             }
             case Constantes.OPE_BUSCAR_ESTUDIANTE_BY_CURSO: {
                 try{
-                    List<Authority> authorities = authorityService.buscarAuhtorities();
-                    Listas listas = new Listas();
-                    listas.setListaObjetos(authorities);
-                    return Utilidades.validarListaResponse(listas, respuesta);
+
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
@@ -685,10 +707,56 @@ public class FacadeImpl implements Facade {
                 }
             }
             case Constantes.OPE_BUSCAR_ESTUDIANTES_BY_CURSO: {
-
+                try{
+                    String codigoCurso = objeto.get("codigoCurso").getAsString();
+                    Curso curso = cursoService.buscarCursoByCodigo(codigoCurso);
+                    List<MatriculaAcademica> matriculaAcademicas = matriculaAcademicaService.buscarMatriculaAcademicaByCurso(curso);
+                    List<Estudiante> estudiantes = matriculaAcademicas != null && !matriculaAcademicas.isEmpty() ?
+                            matriculaAcademicas.stream().map(ma -> ma.getEstudiante()).collect(Collectors.toList()) : null;
+                    Listas listas = new Listas();
+                    listas.setListaObjetos(estudiantes);
+                    return Utilidades.validarListaResponse(listas, respuesta);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                    LOGGER.error(ex.getMessage());
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    return ResponseEntity.status(500).body(respuesta);
+                }
             }
             case Constantes.OPE_ASIGNAR_PROFESOR_CURSO: {
-
+                try{
+                    JsonObject objectCurso = objeto.get("curso").getAsJsonObject();
+                    JsonObject objectProfesor = objeto.get("profesor").getAsJsonObject();
+                    String codigoCurso = objectCurso.get("codigoCurso").getAsString();
+                    String codigoProfesor = objectProfesor.get("codigoProfesor").getAsString();
+                    Curso curso = cursoService.buscarCursoByCodigo(codigoCurso);
+                    Profesor profesor = profesorService.buscarProfesorByCodigo(codigoProfesor);
+                    LOGGER.info("El id del profesor es "+profesor.getId());
+                    List<MatriculaAcademica> matriculaAcademicas = matriculaAcademicaService.buscarMatriculaAcademicaByCurso(curso);
+                    matriculaAcademicas = matriculaAcademicas.stream().map(m -> {
+                        try{
+                            LOGGER.info("JSE --> El id matricula es "+m.getId());
+                            LOGGER.info("JSE --> El id estudiante es "+m.getEstudiante().getId());
+                            LOGGER.info("JSE --> El id curso es "+m.getCurso().getId());
+                            //LOGGER.info("JSE --> El codigo del profesor es "+profesor.getCodigoProfesor());
+                            //LOGGER.info("JSE --> El id del profesor es "+profesor.getId());
+                            //Profesor profesor = profesorService.buscarProfesorByCodigo(codigoProfesor);
+                            m.setProfesor(profesor);
+                            return matriculaAcademicaService.crearMatriculaAcademica(m);
+                        }catch (Exception ex){
+                            ex.printStackTrace();
+                        }
+                        return null;
+                    }).collect(Collectors.toList());
+                    Listas listas = new Listas();
+                    listas.add(matriculaAcademicas);
+                    return Utilidades.validarListaResponse(listas, respuesta);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                    LOGGER.error(ex.getMessage());
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    return ResponseEntity.status(500).body(respuesta);
+                }
             }
             case Constantes.OPE_REASIGNAR_PROFESOR_CURSO: {
 

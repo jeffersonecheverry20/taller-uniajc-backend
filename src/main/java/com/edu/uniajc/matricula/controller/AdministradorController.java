@@ -27,18 +27,6 @@ public class AdministradorController {
         return facade.operation(json);
     }
 
-    @GetMapping("/buscar/carrera/{id}")
-    public ResponseEntity buscarCarreraById(@PathVariable("id") Long id){
-        LOGGER.info("JSE --> Ejecuto el controller de buscarCarreraById");
-        return facade.operation(Utilidades.buildObject(Constantes.OPE_BUSCAR_CARRERA_BY_ID, id));
-    }
-
-    @GetMapping("/buscar/carrera")
-    public ResponseEntity buscarCarreras(){
-        LOGGER.info("JSE --> Ejecuto el controller de buscarCarreras");
-        return facade.operation(Utilidades.buildObject(Constantes.OPE_BUSCAR_CARRERAS, null));
-    }
-
     @DeleteMapping("/eliminar/carrera/{id}")
     public ResponseEntity eliminarCarreraById(@PathVariable("id") Long id){
         LOGGER.info("JSE --> Ejecuto el controller de eliminarCarreraById");
@@ -139,6 +127,11 @@ public class AdministradorController {
         return facade.operation(json);
     }
 
+    @PostMapping("/matricular/asignarProfesor")
+    public ResponseEntity asignarProfesor(@RequestBody String json){
+        LOGGER.info("JSE --> Ejecuto el controller de matricularEstudiante");
+        return facade.operation(json);
+    }
 
     //Tipos Documentos
 
@@ -172,24 +165,6 @@ public class AdministradorController {
     public ResponseEntity crearCurso(@RequestBody String json){
         LOGGER.info("JSE --> Ejecuto el controller de crearCurso");
         return facade.operation(json);
-    }
-
-    @GetMapping("/buscar/curso/{id}")
-    public ResponseEntity buscarCursoById(@PathVariable Long id){
-        LOGGER.info("JSE --> Ejecuto el controller de buscarCursoById");
-        return facade.operation(Utilidades.buildObject(Constantes.OPE_BUSCAR_CURSO_BY_ID, id));
-    }
-
-    @GetMapping("/buscar/cursoCodigo/{codigo}")
-    public ResponseEntity buscarCursoById(@PathVariable String codigo){
-        LOGGER.info("JSE --> Ejecuto el controller de buscarCursoByCodigo");
-        return facade.operation(Utilidades.buildObject(Constantes.OPE_BUSCAR_CURSO_BY_CODIGO, codigo));
-    }
-
-    @GetMapping("/buscar/curso")
-    public ResponseEntity buscarCurso(){
-        LOGGER.info("JSE --> Ejecuto el controller de buscarCurso");
-        return facade.operation(Utilidades.buildObject(Constantes.OPE_BUSCAR_CURSOS, null));
     }
 
     @DeleteMapping("/eliminar/curso/{id}")

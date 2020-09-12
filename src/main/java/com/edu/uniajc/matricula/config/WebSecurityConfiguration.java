@@ -50,8 +50,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                //.antMatchers("/**/create/carrera").access("hasRole('Administrador')")
-                //.antMatchers("/**/eliminar/carrera/**").access("hasRole('Administrador')")
+                //.antMatchers("/**/crear/estudiante").access("hasRole('Administrador')")
+                //.antMatchers("/administrador/eliminar/carrera/**").access("hasRole('Administrador')")
                 //.antMatchers("/**/crear/authority").access("hasRole('Administrador')")
                 //.antMatchers("/**/eliminar/authority/**").access("hasRole('Administrador')")
                 //.antMatchers("/**/crear/estudiante").access("hasRole('Administrador')")

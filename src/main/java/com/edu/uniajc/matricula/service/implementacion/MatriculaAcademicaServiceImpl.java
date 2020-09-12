@@ -27,8 +27,12 @@ public class MatriculaAcademicaServiceImpl implements IMatriculaAcademicaService
     public MatriculaAcademica crearMatriculaAcademica(MatriculaAcademica matriculaAcademica) throws SQLException, Exception {
         MatriculaAcademica matriculaAcademicaBD = buscarMatriculaAcademicaByCursoAndEstudiante(matriculaAcademica.getCurso(), matriculaAcademica.getEstudiante());
         if(matriculaAcademicaBD != null){
+            LOGGER.info("JSE --> Encontre registro en la base de datos para actualizar matricula");
+            LOGGER.info("JSE --> El codigo del profesor es "+matriculaAcademicaBD.getProfesor().getCodigoProfesor());
+            LOGGER.info("JSE --> El id del profesor es "+matriculaAcademicaBD.getProfesor().getId());
             matriculaAcademicaBD.setCurso(matriculaAcademica.getCurso());
             matriculaAcademicaBD.setEstudiante(matriculaAcademica.getEstudiante());
+            matriculaAcademicaBD.setProfesor(matriculaAcademica.getProfesor());
             return matriculaAcademicaRepository.save(matriculaAcademicaBD);
         }
         return matriculaAcademicaRepository.save(matriculaAcademica);
