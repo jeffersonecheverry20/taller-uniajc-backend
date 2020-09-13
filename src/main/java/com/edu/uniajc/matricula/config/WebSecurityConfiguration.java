@@ -50,18 +50,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                //.antMatchers("/**/crear/estudiante").access("hasRole('Administrador')")
-                //.antMatchers("/administrador/eliminar/carrera/**").access("hasRole('Administrador')")
-                //.antMatchers("/**/crear/authority").access("hasRole('Administrador')")
-                //.antMatchers("/**/eliminar/authority/**").access("hasRole('Administrador')")
-                //.antMatchers("/**/crear/estudiante").access("hasRole('Administrador')")
-                //.antMatchers("/**/eliminar/estudiante/**").access("hasRole('Administrador')")
-                //.antMatchers("/**/crear/profesor").access("hasRole('Administrador')")
-                //.antMatchers("/**/eliminar/profesor/**").access("hasRole('Administrador')")
-                //.antMatchers("/**/eliminar/administrador/**").access("hasRole('Administrador')")
-                //.antMatchers("/**/crear/tipoDocumento").access("hasRole('Administrador')")
-                //.antMatchers("/**/buscar/estudiante").access("hasRole('Administrador')")
-                //.antMatchers("/**/buscar/estudiante/**").hasRole("Profesor")
+                .antMatchers("/**/crear/**").access("hasRole('ROLE_ADMIN')")
+                .antMatchers("/**/eliminar/**/**").access("hasRole('ROLE_ADMIN')")
                 .antMatchers(
                         "/",
                         "/v2/api-docs",

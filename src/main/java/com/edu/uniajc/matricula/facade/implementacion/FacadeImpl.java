@@ -274,6 +274,7 @@ public class FacadeImpl implements Facade {
                     Persona persona = Utilidades.validarObjeto(estudiante) ? personaService.buscarPersonaByEstudiante(estudiante) : null;
                     if(Utilidades.validarObjeto(persona)){
                         LOGGER.info("JSE --> El objeto persona no es null");
+                        LOGGER.info("JSE --> La persona es "+persona.getId());
                         LOGGER.info("JSE --> El estudiante es "+estudiante.getId());
                         LOGGER.info("JSE --> El usuario es "+persona.getUsuario().getId());
                         personaService.eliminarPersonaByEstudiante(estudiante);

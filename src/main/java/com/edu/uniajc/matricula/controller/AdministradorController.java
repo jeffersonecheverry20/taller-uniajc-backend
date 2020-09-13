@@ -4,14 +4,17 @@ import com.edu.uniajc.matricula.facade.Facade;
 import com.edu.uniajc.matricula.modelo.Respuesta;
 import com.edu.uniajc.matricula.util.Constantes;
 import com.edu.uniajc.matricula.util.Utilidades;
+import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/administrador")
+@Api(tags = "Login")
 public class AdministradorController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AdministradorController.class);
