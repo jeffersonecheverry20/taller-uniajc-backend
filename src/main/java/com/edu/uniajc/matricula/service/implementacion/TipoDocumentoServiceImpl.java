@@ -21,7 +21,7 @@ public class TipoDocumentoServiceImpl implements ITipoDocumentoService {
 
     @Override
     public TipoDocumento crearTipoDocumento(TipoDocumento tipoDocumento) throws SQLException, Exception {
-        TipoDocumento tipoDocumentoBD = buscarTipoDocumentoByCodigo(tipoDocumento.getCodigo());
+        TipoDocumento tipoDocumentoBD = tipoDocumento.getId() != null ? buscarTipoDocumentoById(tipoDocumento.getId()) : null;
         if(tipoDocumentoBD != null){
             tipoDocumentoBD.setCodigo(tipoDocumento.getCodigo());
             tipoDocumentoBD.setValor(tipoDocumento.getValor());

@@ -25,9 +25,9 @@ public class LoginController {
     @PostMapping
     @ApiOperation(value = "Login", httpMethod = "POST", notes = "Este metedo permite logearse")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Cliente Logeado"),
-            @ApiResponse(code = 400, message = "Data Invalida"),
-            @ApiResponse(code = 500, message = "Error Servidor")
+            @ApiResponse(code = 200, message = "Cliente logeado"),
+            @ApiResponse(code = 400, message = "Error del cliente"),
+            @ApiResponse(code = 500, message = "Error servidor")
     })
     public ResponseEntity login(@RequestBody String json){
         LOGGER.info("JSE --> Ejecuto el controller login");

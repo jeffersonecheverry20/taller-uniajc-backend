@@ -5,8 +5,18 @@ public class Constantes {
     public static final String CODIGO_EXITOSO = "0";
     public static final String CODIGO_FALLO = "1";
 
-    public static final String EXITO = "Respuesta Exitosa";
-    public static final String FALLO = "";
+    public static final String EXITO = "Exitosa";
+    public static final String FALLO = "No Exitosa";
+
+    //Mensaje Generico
+    public static final String MENSAJE = "El %s no fue %s y el mensaje de error es %s";
+    public static final String OBJETO_NULL = "objeto nulo o vacío";
+    public static final String PASSWORDANDUSUARIO = "password y/o usuario no coinciden";
+    public static final String ENCONTRADO = "encontrado";
+    public static final String CREADO = "creado";
+    public static final String ELIMINADO = "eliminado";
+    public static final String LOGEADO = "logeado";
+    public static final String MATRICULA = "matriculado";
 
     //Carrera
     public static final String OPE_CREAR_CARRERA = "CrearCarrera";

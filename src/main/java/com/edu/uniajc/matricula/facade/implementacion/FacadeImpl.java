@@ -9,7 +9,6 @@ import com.edu.uniajc.matricula.security.JwtUtil;
 import com.edu.uniajc.matricula.service.*;
 import com.edu.uniajc.matricula.util.Constantes;
 import com.edu.uniajc.matricula.util.Utilidades;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
@@ -17,9 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import springfox.documentation.spring.web.json.Json;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,8 +24,6 @@ import java.util.stream.Collectors;
 public class FacadeImpl implements Facade {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FacadeImpl.class);
-
-    private Gson gson = new Gson();
 
     @Autowired
     private ICarreraService carreraService;
@@ -77,40 +72,40 @@ public class FacadeImpl implements Facade {
 
         switch (operacion) {
             case Constantes.OPE_LOGIN: {
-                JsonObject objectUsuario = objeto.get("usuario").getAsJsonObject();
+                JsonObject objectUsuario = objeto.get("objeto").getAsJsonObject();
                 try{
                     Usuario usuario = usuarioService.buscarUsuarioByUsuarioandPassword(objectUsuario.get("usuario").getAsString(), objectUsuario.get("password").getAsString());
                     Persona persona = Utilidades.validarObjeto(usuario) ? personaService.buscarPersonaByUsuario(usuario) : null;
                     Autenticacion autenticacion = Utilidades.validarObjeto(persona) ?
                         Utilidades.buildAutenticacion(jwtUtil.generateToken(usuario), Utilidades.buscarAuhtority(persona).getRol()) : null;
-                    return Utilidades.validarResponse(autenticacion, respuesta);
+                    return Utilidades.validarResponse(autenticacion, respuesta, Constantes.LOGEADO, Constantes.PASSWORDANDUSUARIO);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Autenticacion.class.getName(), Constantes.LOGEADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
             case Constantes.OPE_CREAR_CARRERA: {
                 try{
-                    JsonObject objectCarrera = objeto.get("carrera").getAsJsonObject();
+                    JsonObject objectCarrera = objeto.get("objeto").getAsJsonObject();
                     Carrera carrera = carreraService.crearCarrera(Utilidades.buildCarrera(objectCarrera));
-                    return Utilidades.validarResponse(carrera, respuesta);
+                    return Utilidades.validarResponse(carrera, respuesta, Constantes.CREADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Carrera.class.getName(), Constantes.CREADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
             case Constantes.OPE_BUSCAR_CARRERA_BY_ID: {
                 try{
                     Carrera carrera = carreraService.buscarCarreraById(objeto.get("objeto").getAsLong());
-                    return Utilidades.validarResponse(carrera, respuesta);
+                    return Utilidades.validarResponse(carrera, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Carrera.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -119,44 +114,45 @@ public class FacadeImpl implements Facade {
                     List<Carrera> carreras = carreraService.buscarCarreras();
                     Listas listas = new Listas();
                     listas.add(carreras);
-                    return Utilidades.validarListaResponse(listas, respuesta);
+                    return Utilidades.validarListaResponse(listas, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Carrera.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
             case Constantes.OPE_ELIMINAR_CARRERA: {
                 try{
                     Carrera carrera = carreraService.eliminarCarrera(objeto.get("objeto").getAsLong());
-                    return Utilidades.validarResponse(carrera, respuesta);
+                    return Utilidades.validarResponse(carrera, respuesta, Constantes.ELIMINADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Carrera.class.getName(), Constantes.ELIMINADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
             case Constantes.OPE_CREAR_AUTHORITY: {
                 try{
-                    Authority authority = authorityService.crearAuthority(Utilidades.buildAuthority(objeto));
-                    return Utilidades.validarResponse(authority, respuesta);
+                    JsonObject objectAuthority = objeto.get("objeto").getAsJsonObject();
+                    Authority authority = authorityService.crearAuthority(Utilidades.buildAuthority(objectAuthority));
+                    return Utilidades.validarResponse(authority, respuesta, Constantes.CREADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Authority.class.getName(), Constantes.CREADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
             case Constantes.OPE_BUSCAR_AUTHORITY: {
                 try{
                     Authority authority = authorityService.buscarAuthorityById(objeto.get("objeto").getAsLong());
-                    return Utilidades.validarResponse(authority, respuesta);
+                    return Utilidades.validarResponse(authority, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Authority.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -165,59 +161,48 @@ public class FacadeImpl implements Facade {
                     List<Authority> authorities = authorityService.buscarAuhtorities();
                     Listas listas = new Listas();
                     listas.setListaObjetos(authorities);
-                    return Utilidades.validarListaResponse(listas, respuesta);
+                    return Utilidades.validarListaResponse(listas, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Authority.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
             case Constantes.OPE_ELIMINAR_AUTHORITY: {
                 try{
                     Authority authority = authorityService.eliminarAuthority(objeto.get("objeto").getAsLong());
-                    return Utilidades.validarResponse(authority, respuesta);
+                    return Utilidades.validarResponse(authority, respuesta, Constantes.ELIMINADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Authority.class.getName(), Constantes.ELIMINADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
             case Constantes.OPE_CREAR_ESTUDIANTE: {
                 try{
                     LOGGER.info("El objeto es "+objeto);
-                    JsonObject objectPersona = objeto.get("persona").getAsJsonObject();
-                    LOGGER.info("El objetoPersona es "+objectPersona);
+                    JsonObject objectPersona = objeto.get("objeto").getAsJsonObject();
                     JsonObject objectUsuario = objectPersona.get("usuario").getAsJsonObject();
                     Usuario usuario = usuarioService.crearUsuario(Utilidades.buildUsuario(objectUsuario));
-                    LOGGER.info("El objetcoUsuario es "+objectUsuario);
                     JsonObject objectEstudiante = objectPersona.get("estudiante").getAsJsonObject();
-                    LOGGER.info("El objetoEstudiante es "+objectEstudiante);
                     JsonObject objectCarrera = objectEstudiante.get("carrera").getAsJsonObject();
-                    LOGGER.info("El objetoCarera es "+objectCarrera);
                     JsonObject objectAuthority = objectEstudiante.get("authority").getAsJsonObject();
-                    LOGGER.info("El objectAuthority es "+objectAuthority);
                     String nombreCarrera = objectCarrera.get("nombreCarrera").getAsString();
                     Carrera carrera = carreraService.buscarCarreraByNombre(nombreCarrera);
-                    LOGGER.info("El idCarrera es "+carrera.getId());
-                    LOGGER.info("El nombreCarrera es "+carrera.getNombreCarrera());
                     String rolAuthority = objectAuthority.get("rol").getAsString();
                     Authority authority = authorityService.buscarAuthorityByRol(rolAuthority);
-                    LOGGER.info("El idAuthority es "+authority.getId());
-                    LOGGER.info("El rolAuthority es "+authority.getRol());
                     Estudiante estudiante = estudianteService.crearEstudiante(Utilidades.buildEstudiante(objectEstudiante, carrera, authority));
                     JsonObject objectTipoDocumento = objectPersona.get("tipoDocumento").getAsJsonObject();
-                    LOGGER.info("JSE --> El objeto de tipo documento es "+ objectTipoDocumento);
                     String codigoDocumento = objectTipoDocumento.get("codigo").getAsString();
                     TipoDocumento tipoDocumento = tipoDocumentoService.buscarTipoDocumentoByCodigo(codigoDocumento);
-                    LOGGER.info("JSE --> El id del tipoDocumento es "+tipoDocumento.getId());
                     Persona persona = personaService.crearPersona(Utilidades.buildPersona(objectPersona, tipoDocumento,estudiante, null, null , usuario));
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.CREADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Estudiante.class.getName(), Constantes.CREADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -226,11 +211,13 @@ public class FacadeImpl implements Facade {
                     LOGGER.info("JSE --> El id es "+objeto.get("objeto").getAsLong());
                     Estudiante estudiante = estudianteService.buscarEstudianteById(objeto.get("objeto").getAsLong());
                     Persona persona = personaService.buscarPersonaByEstudiante(estudiante);
-                    return Utilidades.validarResponse(persona, respuesta);
+                    persona.setFechaNacimiento(Utilidades.formatDate(persona.getFechaNacimiento()));
+                    LOGGER.info("JSE --> La fecha formateada es "+persona.getFechaNacimiento());
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Estudiante.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -238,11 +225,11 @@ public class FacadeImpl implements Facade {
                 try{
                     Estudiante estudiante = estudianteService.buscarEstudianteByCodigo(objeto.get("objeto").getAsString());
                     Persona persona = personaService.buscarPersonaByEstudiante(estudiante);
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Estudiante.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -252,19 +239,23 @@ public class FacadeImpl implements Facade {
                     List<Persona> personas = estudiantes != null && !estudiantes.isEmpty() ?
                             estudiantes.stream().map(e -> {
                                 try{
-                                    return personaService.buscarPersonaByEstudiante(e);
+                                    Persona persona = personaService.buscarPersonaByEstudiante(e);
+                                    persona.setFechaNacimiento(Utilidades.formatDate(persona.getFechaNacimiento()));
+                                    LOGGER.info("JSE --> La fecha formateada es "+persona.getFechaNacimiento());
+                                    return persona;
                                 }catch (Exception ex){
-
+                                    ex.printStackTrace();
+                                    LOGGER.info(ex.getMessage());
                                 }
                                 return null;
                             }).collect(Collectors.toList()) : null;
                     Listas listas = new Listas();
                     listas.setListaObjetos(personas);
-                    return Utilidades.validarListaResponse(listas, respuesta);
+                    return Utilidades.validarListaResponse(listas, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Estudiante.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -273,19 +264,15 @@ public class FacadeImpl implements Facade {
                     Estudiante estudiante = estudianteService.buscarEstudianteById(objeto.get("objeto").getAsLong());
                     Persona persona = Utilidades.validarObjeto(estudiante) ? personaService.buscarPersonaByEstudiante(estudiante) : null;
                     if(Utilidades.validarObjeto(persona)){
-                        LOGGER.info("JSE --> El objeto persona no es null");
-                        LOGGER.info("JSE --> La persona es "+persona.getId());
-                        LOGGER.info("JSE --> El estudiante es "+estudiante.getId());
-                        LOGGER.info("JSE --> El usuario es "+persona.getUsuario().getId());
                         personaService.eliminarPersonaByEstudiante(estudiante);
                         estudianteService.eliminarEstudianteById(estudiante.getId());
                         usuarioService.eliminarUsuarioById(persona.getUsuario().getId());
                     }
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.ELIMINADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Estudiante.class.getName(), Constantes.ELIMINADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -298,23 +285,23 @@ public class FacadeImpl implements Facade {
                         estudianteService.eliminarEstudianteByCodigo(estudiante.getCodigoEstudiante());
                         usuarioService.eliminarUsuarioById(persona.getUsuario().getId());
                     }
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.ELIMINADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Estudiante.class.getName(), Constantes.ELIMINADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
             case Constantes.OPE_CREAR_TD: {
                 try{
-                    JsonObject objectTipoDocumento = objeto.get("tipoDocumento").getAsJsonObject();
+                    JsonObject objectTipoDocumento = objeto.get("objeto").getAsJsonObject();
                     TipoDocumento tipoDocumento = tipoDocumentoService.crearTipoDocumento(Utilidades.buildTipoDocumento(objectTipoDocumento));
-                    return Utilidades.validarResponse(tipoDocumento, respuesta);
+                    return Utilidades.validarResponse(tipoDocumento, respuesta, Constantes.CREADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, TipoDocumento.class.getName(), Constantes.CREADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -322,11 +309,11 @@ public class FacadeImpl implements Facade {
                 try{
                     LOGGER.info("JSE --> El id es "+objeto.get("objeto").getAsLong());
                     TipoDocumento tipoDocumento = tipoDocumentoService.buscarTipoDocumentoById(objeto.get("objeto").getAsLong());
-                    return Utilidades.validarResponse(tipoDocumento, respuesta);
+                    return Utilidades.validarResponse(tipoDocumento, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, TipoDocumento.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -335,11 +322,11 @@ public class FacadeImpl implements Facade {
                     List<TipoDocumento> tipoDocumentos = tipoDocumentoService.buscarTipoDocumentos();
                     Listas listas = new Listas();
                     listas.add(tipoDocumentos);
-                    return Utilidades.validarListaResponse(listas, respuesta);
+                    return Utilidades.validarListaResponse(listas, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, TipoDocumento.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -347,18 +334,18 @@ public class FacadeImpl implements Facade {
                 try{
                     LOGGER.info("JSE --> El id es "+objeto.get("objeto").getAsLong());
                     TipoDocumento tipoDocumento = tipoDocumentoService.eliminarTipoDocumento(objeto.get("objeto").getAsLong());
-                    return Utilidades.validarResponse(tipoDocumento, respuesta);
+                    return Utilidades.validarResponse(tipoDocumento, respuesta, Constantes.ELIMINADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, TipoDocumento.class.getName(), Constantes.ELIMINADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
             case Constantes.OPE_CREAR_PROFESOR: {
                 try{
                     LOGGER.info("El objeto es "+objeto);
-                    JsonObject objectPersona = objeto.get("persona").getAsJsonObject();
+                    JsonObject objectPersona = objeto.get("objeto").getAsJsonObject();
                     LOGGER.info("El objetoPersona es "+objectPersona);
                     JsonObject objectUsuario = objectPersona.get("usuario").getAsJsonObject();
                     Usuario usuario = usuarioService.crearUsuario(Utilidades.buildUsuario(objectUsuario));
@@ -378,11 +365,11 @@ public class FacadeImpl implements Facade {
                     TipoDocumento tipoDocumento = tipoDocumentoService.buscarTipoDocumentoByCodigo(codigoDocumento);
                     LOGGER.info("JSE --> El id del tipoDocumento es "+tipoDocumento.getId());
                     Persona persona = personaService.crearPersona(Utilidades.buildPersona(objectPersona, tipoDocumento,null, null, profesor , usuario));
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.CREADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Profesor.class.getName(), Constantes.CREADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             } case Constantes.OPE_BUSCAR_PROFESOR_BY_ID: {
@@ -390,11 +377,11 @@ public class FacadeImpl implements Facade {
                     LOGGER.info("JSE --> El id es "+objeto.get("objeto").getAsLong());
                     Profesor profesor = profesorService.buscarProfesorById(objeto.get("objeto").getAsLong());
                     Persona persona = personaService.buscarPersonaByProfesor(profesor);
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Profesor.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -403,11 +390,11 @@ public class FacadeImpl implements Facade {
                     LOGGER.info("JSE --> El id es "+objeto.get("objeto").getAsLong());
                     Profesor profesor = profesorService.buscarProfesorByCodigo(objeto.get("objeto").getAsString());
                     Persona persona = personaService.buscarPersonaByProfesor(profesor);
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Profesor.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -425,11 +412,11 @@ public class FacadeImpl implements Facade {
                             }).collect(Collectors.toList()) : null;
                     Listas listas = new Listas();
                     listas.add(personas);
-                    return Utilidades.validarListaResponse(listas, respuesta);
+                    return Utilidades.validarListaResponse(listas, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Profesor.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -442,11 +429,11 @@ public class FacadeImpl implements Facade {
                         profesorService.eliminarProfesorById(profesor.getId());
                         usuarioService.eliminarUsuarioById(persona.getUsuario().getId());
                     }
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.ELIMINADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Profesor.class.getName(), Constantes.ELIMINADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -459,18 +446,18 @@ public class FacadeImpl implements Facade {
                         profesorService.eliminarProfesorByCodigo(profesor.getCodigoProfesor());
                         usuarioService.eliminarUsuarioById(persona.getUsuario().getId());
                     }
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.ELIMINADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Profesor.class.getName(), Constantes.ELIMINADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
             case Constantes.OPE_CREAR_ADMINISTRADOR: {
                 try{
                     LOGGER.info("El objeto es "+objeto);
-                    JsonObject objectPersona = objeto.get("persona").getAsJsonObject();
+                    JsonObject objectPersona = objeto.get("objeto").getAsJsonObject();
                     LOGGER.info("El objetoPersona es "+objectPersona);
                     JsonObject objectUsuario = objectPersona.get("usuario").getAsJsonObject();
                     Usuario usuario = usuarioService.crearUsuario(Utilidades.buildUsuario(objectUsuario));
@@ -490,11 +477,11 @@ public class FacadeImpl implements Facade {
                     TipoDocumento tipoDocumento = tipoDocumentoService.buscarTipoDocumentoByCodigo(codigoDocumento);
                     LOGGER.info("JSE --> El id del tipoDocumento es "+tipoDocumento.getId());
                     Persona persona = personaService.crearPersona(Utilidades.buildPersona(objectPersona, tipoDocumento,null, administrador, null, usuario));
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.CREADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Administrador.class.getName(), Constantes.CREADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             } case Constantes.OPE_BUSCAR_ADMINISTRADOR_BY_ID: {
@@ -504,11 +491,11 @@ public class FacadeImpl implements Facade {
                     //LOGGER.info("JSE --> El estudiante es "+administrador.toString());
                     Persona persona = personaService.buscarPersonaByAdministrador(administrador);
                     //LOGGER.info("JSE --> La persona es "+persona);
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Administrador.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -517,11 +504,11 @@ public class FacadeImpl implements Facade {
                     LOGGER.info("JSE --> El id es "+objeto.get("objeto").getAsLong());
                     Administrador administrador = administradorService.buscarAdministradorByCodigo(objeto.get("objeto").getAsString());
                     Persona persona = personaService.buscarPersonaByAdministrador(administrador);
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Administrador.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -539,11 +526,11 @@ public class FacadeImpl implements Facade {
                             }).collect(Collectors.toList()) : null;
                     Listas listas = new Listas();
                     listas.add(personas);
-                    return Utilidades.validarListaResponse(listas, respuesta);
+                    return Utilidades.validarListaResponse(listas, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Administrador.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -556,11 +543,11 @@ public class FacadeImpl implements Facade {
                         administradorService.eliminarAdministradorById(administrador.getId());
                         usuarioService.eliminarUsuarioById(persona.getUsuario().getId());
                     }
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.ELIMINADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Administrador.class.getName(), Constantes.ELIMINADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -573,23 +560,23 @@ public class FacadeImpl implements Facade {
                         profesorService.eliminarProfesorByCodigo(administrador.getCodigoAdministrador());
                         usuarioService.eliminarUsuarioById(persona.getUsuario().getId());
                     }
-                    return Utilidades.validarResponse(persona, respuesta);
+                    return Utilidades.validarResponse(persona, respuesta, Constantes.ELIMINADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Administrador.class.getName(), Constantes.ELIMINADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
             case Constantes.OPE_CREAR_CURSO: {
                 try{
-                    JsonObject objectCurso = objeto.get("curso").getAsJsonObject();
+                    JsonObject objectCurso = objeto.get("objeto").getAsJsonObject();
                     Curso curso = cursoService.crearCurso(Utilidades.buildCurso(objectCurso));
-                    return Utilidades.validarResponse(curso, respuesta);
+                    return Utilidades.validarResponse(curso, respuesta, Constantes.CREADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Curso.class.getName(), Constantes.CREADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -597,11 +584,11 @@ public class FacadeImpl implements Facade {
                 try{
                     LOGGER.info("JSE --> El id es "+objeto.get("objeto").getAsLong());
                     Curso curso = cursoService.buscarCursoById(objeto.get("objeto").getAsLong());
-                    return Utilidades.validarResponse(curso, respuesta);
+                    return Utilidades.validarResponse(curso, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Curso.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -609,11 +596,11 @@ public class FacadeImpl implements Facade {
                 try{
                     LOGGER.info("JSE --> El id es "+objeto.get("objeto").getAsString());
                     Curso curso = cursoService.buscarCursoByCodigo(objeto.get("objeto").getAsString());
-                    return Utilidades.validarResponse(curso, respuesta);
+                    return Utilidades.validarResponse(curso, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Curso.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -622,11 +609,11 @@ public class FacadeImpl implements Facade {
                     List<Curso> cursos = cursoService.buscarCursos();
                     Listas listas =  new Listas();
                     listas.add(cursos);
-                    return Utilidades.validarListaResponse(listas, respuesta);
+                    return Utilidades.validarListaResponse(listas, respuesta, Constantes.ENCONTRADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Curso.class.getName(), Constantes.ENCONTRADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -634,11 +621,11 @@ public class FacadeImpl implements Facade {
                 try{
                     LOGGER.info("JSE --> El id es "+objeto.get("objeto").getAsLong());
                     Curso curso = cursoService.eliminarCursoById(objeto.get("objeto").getAsLong());
-                    return Utilidades.validarResponse(curso, respuesta);
+                    return Utilidades.validarResponse(curso, respuesta, Constantes.ELIMINADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Curso.class.getName(), Constantes.ELIMINADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -646,11 +633,11 @@ public class FacadeImpl implements Facade {
                 try{
                     LOGGER.info("JSE --> El id es "+objeto.get("objeto").getAsString());
                     Curso curso = cursoService.eliminarCursoByCodigo(objeto.get("objeto").getAsString());
-                    return Utilidades.validarResponse(curso, respuesta);
+                    return Utilidades.validarResponse(curso, respuesta, Constantes.ELIMINADO, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Curso.class.getName(), Constantes.ELIMINADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -673,11 +660,11 @@ public class FacadeImpl implements Facade {
 
                     //Matricula Academica
                     MatriculaAcademica matriculaAcademica = matriculaAcademicaService.crearMatriculaAcademica(Utilidades.buildMatriculaAcademica(curso, estudiante, false, nota, null));
-                    return Utilidades.validarResponse(matriculaAcademica, respuesta);
+                    return Utilidades.validarResponse(matriculaAcademica, respuesta, Constantes.MATRICULA, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, MatriculaAcademica.class.getName(), Constantes.MATRICULA, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -689,11 +676,11 @@ public class FacadeImpl implements Facade {
                     Listas listas = new Listas();
                     listas.add(academicaListas);
                     Profesor profesor = Utilidades.validarListaObjetos(listas) ? academicaListas.get(0).getProfesor() : null;
-                    return Utilidades.validarResponse(profesor, respuesta);
+                    return Utilidades.validarResponse(profesor, respuesta, Constantes.MATRICULA, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, MatriculaAcademica.class.getName(), Constantes.CREADO, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -716,11 +703,11 @@ public class FacadeImpl implements Facade {
                             matriculaAcademicas.stream().map(ma -> ma.getEstudiante()).collect(Collectors.toList()) : null;
                     Listas listas = new Listas();
                     listas.setListaObjetos(estudiantes);
-                    return Utilidades.validarListaResponse(listas, respuesta);
+                    return Utilidades.validarListaResponse(listas, respuesta, Constantes.MATRICULA, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Profesor.class.getName(), Constantes.MATRICULA, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -736,12 +723,6 @@ public class FacadeImpl implements Facade {
                     List<MatriculaAcademica> matriculaAcademicas = matriculaAcademicaService.buscarMatriculaAcademicaByCurso(curso);
                     matriculaAcademicas = matriculaAcademicas.stream().map(m -> {
                         try{
-                            LOGGER.info("JSE --> El id matricula es "+m.getId());
-                            LOGGER.info("JSE --> El id estudiante es "+m.getEstudiante().getId());
-                            LOGGER.info("JSE --> El id curso es "+m.getCurso().getId());
-                            //LOGGER.info("JSE --> El codigo del profesor es "+profesor.getCodigoProfesor());
-                            //LOGGER.info("JSE --> El id del profesor es "+profesor.getId());
-                            //Profesor profesor = profesorService.buscarProfesorByCodigo(codigoProfesor);
                             m.setProfesor(profesor);
                             return matriculaAcademicaService.crearMatriculaAcademica(m);
                         }catch (Exception ex){
@@ -751,11 +732,11 @@ public class FacadeImpl implements Facade {
                     }).collect(Collectors.toList());
                     Listas listas = new Listas();
                     listas.add(matriculaAcademicas);
-                    return Utilidades.validarListaResponse(listas, respuesta);
+                    return Utilidades.validarListaResponse(listas, respuesta, Constantes.MATRICULA, Constantes.OBJETO_NULL);
                 }catch (Exception ex){
                     ex.printStackTrace();
                     LOGGER.error(ex.getMessage());
-                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, ex.getMessage(), respuesta);
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Profesor.class.getName(), Constantes.MATRICULA, ex.getMessage()), respuesta);
                     return ResponseEntity.status(500).body(respuesta);
                 }
             }
@@ -763,7 +744,24 @@ public class FacadeImpl implements Facade {
 
             }
             case Constantes.OPE_INGRESAR_NOTAS: {
-
+                try{
+                    JsonObject objectCurso = objeto.get("curso").getAsJsonObject();
+                    JsonObject objectEstudiante = objeto.get("estudiante").getAsJsonObject();
+                    Curso curso = cursoService.buscarCursoByCodigo(objectCurso.get("codigoCurso").getAsString());
+                    Estudiante estudiante = estudianteService.buscarEstudianteByCodigo(objectEstudiante.get("codigoEstudiante").getAsString());
+                    MatriculaAcademica matriculaAcademica = Utilidades.validarObjeto(curso) && Utilidades.validarObjeto(estudiante) ?
+                            matriculaAcademicaService.buscarMatriculaAcademicaByCursoAndEstudiante(curso, estudiante) : null;
+                    Nota nota = Utilidades.validarObjeto(matriculaAcademica) ? notaService.buscarNotaById(matriculaAcademica.getId()) : null;
+                    nota = Utilidades.validarObjeto(nota) ? notaService.crearNota(nota) : null;
+                    boolean aprobado = Utilidades.validarObjeto(nota) ? notaService.validarAprobacion(nota.getId()) : false ;
+                    if(Utilidades.validarObjeto(matriculaAcademica)) matriculaAcademicaService.actualizarAprobacion(matriculaAcademica, aprobado);
+                    return Utilidades.validarResponse(matriculaAcademica, respuesta, Constantes.MATRICULA, Constantes.OBJETO_NULL);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                    LOGGER.error(ex.getMessage());
+                    respuesta = Utilidades.buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Profesor.class.getName(), Constantes.CREADO, ex.getMessage()), respuesta);
+                    return ResponseEntity.status(500).body(respuesta);
+                }
             }
             default: {
                 break;

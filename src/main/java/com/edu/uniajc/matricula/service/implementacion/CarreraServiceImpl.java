@@ -24,7 +24,7 @@ public class CarreraServiceImpl implements ICarreraService {
     @Override
     public Carrera crearCarrera(Carrera carrera) throws Exception, SQLException {
         LOGGER.info("JSE --> Ejecuto el serivicio de CrearCarrera");
-        Carrera carreraBD = carrera.getNombreCarrera() != null ? buscarCarreraByNombre(carrera.getNombreCarrera()) : null;
+        Carrera carreraBD = carrera.getId() != null ? buscarCarreraById(carrera.getId()) : null;
         if(carreraBD != null){
             LOGGER.info("JSE --> Encontre la carrera con nombre "+carrera.getNombreCarrera());
             carreraBD.setNombreCarrera(carrera.getNombreCarrera());

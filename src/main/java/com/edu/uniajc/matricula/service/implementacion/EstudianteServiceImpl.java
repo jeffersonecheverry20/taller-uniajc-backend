@@ -1,6 +1,7 @@
 package com.edu.uniajc.matricula.service.implementacion;
 
 import com.edu.uniajc.matricula.entity.Estudiante;
+import com.edu.uniajc.matricula.exception.EstudianteException;
 import com.edu.uniajc.matricula.repository.EstudianteRepository;
 import com.edu.uniajc.matricula.service.IEstudianteService;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ public class EstudianteServiceImpl implements IEstudianteService {
 
     @Transactional
     @Override
-    public Estudiante crearEstudiante(Estudiante estudiante) throws SQLException, Exception {
+    public Estudiante crearEstudiante(Estudiante estudiante) throws SQLException, EstudianteException {
         Estudiante estudianteBD = buscarEstudianteByCodigo(estudiante.getCodigoEstudiante());
         if(estudianteBD != null){
             estudianteBD.setAuthority(estudiante.getAuthority());
@@ -34,25 +35,25 @@ public class EstudianteServiceImpl implements IEstudianteService {
 
     @Transactional
     @Override
-    public Estudiante buscarEstudianteById(Long id) throws SQLException, Exception {
+    public Estudiante buscarEstudianteById(Long id) throws SQLException, EstudianteException {
         return estudianteRepository.findById(id).orElse(null);
     }
 
     @Transactional
     @Override
-    public Estudiante buscarEstudianteByCodigo(String codigo) throws SQLException, Exception {
+    public Estudiante buscarEstudianteByCodigo(String codigo) throws SQLException, EstudianteException {
         return estudianteRepository.findByCodigoEstudiante(codigo).orElse(null);
     }
 
     @Transactional
     @Override
-    public List<Estudiante> buscarEstudiantes() throws SQLException, Exception {
+    public List<Estudiante> buscarEstudiantes() throws SQLException, EstudianteException {
         return estudianteRepository.findAll();
     }
 
     @Transactional
     @Override
-    public Estudiante eliminarEstudianteById(Long id) throws SQLException, Exception {
+    public Estudiante eliminarEstudianteById(Long id) throws SQLException, EstudianteException {
         Estudiante estudianteBD = buscarEstudianteById(id);
         if(estudianteBD != null){
             estudianteRepository.deleteById(id);
@@ -61,7 +62,7 @@ public class EstudianteServiceImpl implements IEstudianteService {
     }
 
     @Override
-    public Estudiante eliminarEstudianteByCodigo(String codigo) throws SQLException, Exception {
+    public Estudiante eliminarEstudianteByCodigo(String codigo) throws SQLException, EstudianteException {
         Estudiante estudianteBD = buscarEstudianteByCodigo(codigo);
         if(estudianteBD != null){
             estudianteRepository.delete(estudianteBD);

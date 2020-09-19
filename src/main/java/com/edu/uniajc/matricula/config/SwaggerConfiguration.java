@@ -3,6 +3,7 @@ package com.edu.uniajc.matricula.config;
 import com.google.common.collect.Lists;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Configuration
 @EnableSwagger2
+@EnableTransactionManagement
 public class SwaggerConfiguration {
 
     @Bean

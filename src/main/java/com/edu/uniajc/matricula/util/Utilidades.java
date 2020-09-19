@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
+import javax.xml.crypto.Data;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,7 +28,9 @@ public class Utilidades {
     private JwtUtil jwtUtil;
 
     public static Carrera buildCarrera(JsonObject objeto) {
+        LOGGER.info("JSE --> JsonObectCarrera "+objeto);
         return Carrera.builder()
+                .id(objeto.get("id").getAsLong() != 0 ? objeto.get("id").getAsLong() : null)
                 .nombreCarrera(objeto.get("nombreCarrera").getAsString())
                 .totalCreditos(objeto.get("totalCreditos").getAsInt())
                 .build();
@@ -35,6 +38,7 @@ public class Utilidades {
 
     public static TipoDocumento buildTipoDocumento(JsonObject objeto) {
         return TipoDocumento.builder()
+                .id(objeto.get("id").getAsLong() != 0 ? objeto.get("id").getAsLong() : null)
                 .codigo(objeto.get("codigo").getAsString())
                 .valor(objeto.get("valor").getAsString())
                 .build();
@@ -42,13 +46,16 @@ public class Utilidades {
 
     public static Authority buildAuthority(JsonObject object){
         return Authority.builder()
+                .id(object.get("id").getAsLong() != 0 ? object.get("id").getAsLong() : null)
                 .rol(object.get("rol").getAsString())
                 .build();
     }
 
     public static Persona buildPersona(JsonObject object, TipoDocumento tipoDocumento, Estudiante estudiante, Administrador administrador, Profesor profesor, Usuario usuario){
-        JsonObject objectTipoDocumento = object.get("tipoDocumento").getAsJsonObject();
+        // JsonObject objectTipoDocumento = object.get("tipoDocumento").getAsJsonObject();
         Date fecha = convertStringToDate(object.get("fechaNacimiento").getAsString());
+        LOGGER.info("JSE --> El jsonObject de nacimiento es "+object.get("fechaNacimiento").getAsString());
+        LOGGER.info("JSE --> La fecha es "+ fecha);
         return Persona.builder()
                 .nombre(object.get("nombre").getAsString())
                 .apellido(object.get("apellido").getAsString())
@@ -151,18 +158,18 @@ public class Utilidades {
         return gson.toJson(request);
     }
 
-    public static ResponseEntity validarResponse(Object objeto, Respuesta respuesta){
+    public static ResponseEntity validarResponse(Object objeto, Respuesta respuesta, String tipoOperacion, String mensaje){
         if(objeto == null){
-            respuesta = buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, "", respuesta);
+            respuesta = buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Object.class.getName(), tipoOperacion, mensaje), respuesta);
             return ResponseEntity.status(500).body(respuesta);
         }
         respuesta = buildRespuesta(Constantes.CODIGO_EXITOSO, Constantes.EXITO, objeto, respuesta);
         return ResponseEntity.status(200).body(respuesta);
     }
 
-    public static ResponseEntity validarListaResponse(Listas objetos, Respuesta respuesta){
+    public static ResponseEntity validarListaResponse(Listas objetos, Respuesta respuesta, String tipoOperacion, String mensaje){
         if(objetos == null || objetos.getListaObjetos() == null || objetos.getListaObjetos().isEmpty()){
-            respuesta = buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, "", respuesta);
+            respuesta = buildRespuesta(Constantes.CODIGO_FALLO, Constantes.FALLO, String.format(Constantes.MENSAJE, Object.class.getName(), tipoOperacion, mensaje), respuesta);
             return ResponseEntity.status(500).body(respuesta);
         }
         respuesta = buildRespuesta(Constantes.CODIGO_EXITOSO, Constantes.EXITO, objetos.getListaObjetos(), respuesta);
@@ -178,12 +185,6 @@ public class Utilidades {
     }
 
     public static Authority buscarAuhtority(Persona persona) {
-        //LOGGER.info("JSE --> El estudiante de la persona es "+persona.getEstudiante().toString());
-        //LOGGER.info("JSE --> El profesor de la persona es "+persona.getProfesor().toString());
-        //LOGGER.info("JSE --> El administrador de la persona es "+persona.getAdministrador().toString());
-        LOGGER.info("La persona en utilidades es "+persona.getNombre());
-        LOGGER.info("La persona es diferente de null "+(persona.getEstudiante() != null));
-        //LOGGER.info("El codigo del estudiante es "+persona.getEstudiante().getCodigoEstudiante());
         Authority authority = null;
         if(persona.getEstudiante() != null){
             Estudiante estudiante = persona.getEstudiante();
@@ -192,8 +193,6 @@ public class Utilidades {
             Profesor profesor = persona.getProfesor();
             authority = profesor.getAuthority();
         } else if(persona.getAdministrador() != null){
-            LOGGER.info("JSE --> Entro administrador");
-            LOGGER.info("JSE --> El administrador es "+persona.getAdministrador().toString());
             Administrador administrador = persona.getAdministrador();
             authority = administrador.getAuthority();
         }
@@ -201,10 +200,21 @@ public class Utilidades {
     }
 
     public static Date convertStringToDate(String fechaString){
-        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
         Date fecha = null;
         try{
             fecha = formato.parse(fechaString);
+        }catch (ParseException pe){
+            LOGGER.error(pe.getMessage());
+        }
+        return fecha;
+    }
+
+    public static Date formatDate(Date date){
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+        Date fecha = null;
+        try{
+            fecha = formato.parse(date.toString());
         }catch (ParseException pe){
             LOGGER.error(pe.getMessage());
         }
